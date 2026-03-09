@@ -4,12 +4,13 @@ description: >-
   - Provides up-to-date information for current events and recent data
   - Returns search result information formatted as search result blocks
   - Use this tool for accessing information beyond Agent's knowledge cutoff
-  - Supports multiple search sources: Web search, Arxiv academic papers, and internal Feishu documents
+  - Supports multiple search sources: Web search, Arxiv academic papers, Semantic Scholar, and internal Feishu documents
 
   Usage notes:
     - Choose appropriate search source based on your needs:
       * Web search: Use when user wants to query external information, general web content, news, current events
       * Arxiv search: Use when user wants to query academic papers, research papers, technical publications
+      * Semantic Scholar: Use when user wants to query academic papers with citation analysis, influential papers, and detailed metadata
       * Feishu doc search: Use when user wants to query company internal information, internal company documents and knowledge base
 
 input_schema:
@@ -18,25 +19,27 @@ input_schema:
     query:
       type: string
       description: Search query string
-    
+
     search_source:
       type: string
       enum:
         - web
         - arxiv
+        - semantic_scholar
         - feishu
       default: web
       description: |
         Search source to use:
         - web: Google web search for general web content
         - arxiv: Arxiv repository for academic papers
+        - semantic_scholar: Semantic Scholar for academic papers with citation analysis
         - feishu: Internal Feishu document search
-    
+
     num_results:
       type: integer
       default: 10
       description: Number of results to return
-    
+
     web_search_type:
       type: string
       enum:
@@ -51,7 +54,7 @@ input_schema:
         - images: Image search
         - news: News search
         - places: Location/place search
-    
+
     arxiv_categories:
       type: array
       items:
@@ -60,7 +63,7 @@ input_schema:
         Arxiv category codes to filter by discipline (only used when search_source is 'arxiv'):
         Common: cs.AI (AI), cs.LG (ML), cs.CL (NLP), cs.CV (Vision), stat.ML (Stats)
         Format: subject.subcategory
-    
+
     arxiv_sort_by:
       type: string
       enum:
@@ -73,7 +76,7 @@ input_schema:
         - relevance: Best match first (default)
         - submittedDate: Historical order
         - lastUpdatedDate: Latest updates first
-    
+
     arxiv_sort_order:
       type: string
       enum:
@@ -84,27 +87,61 @@ input_schema:
         Arxiv sort direction (only used when search_source is 'arxiv'):
         - descending: Highest/newest first (default)
         - ascending: Oldest first (for historical analysis)
-    
+
+    semantic_scholar_fields:
+      type: array
+      items:
+        type: string
+      description: |
+        Semantic Scholar fields to retrieve (only used when search_source is 'semantic_scholar'):
+        Common: title, abstract, authors, year, venue, citationCount, referenceCount, publicationDate, journal, url, openAccessPdf
+        Default: [title, abstract, authors, year, venue, citationCount, referenceCount, publicationDate, url]
+
+    semantic_scholar_year_filter:
+      type: array
+      items:
+        type: integer
+      minItems: 2
+      maxItems: 2
+      description: |
+        Year range filter for Semantic Scholar (only used when search_source is 'semantic_scholar'):
+        Format: [min_year, max_year], e.g., [2020, 2024]
+
+    semantic_scholar_sort_by:
+      type: string
+      enum:
+        - relevance
+        - citationCount
+        - publicationDate
+        - influence
+      default: relevance
+      description: |
+        Semantic Scholar sort order (only used when search_source is 'semantic_scholar'):
+        - relevance: Most relevant first (default)
+        - citationCount: Most cited first
+        - publicationDate: Most recent first
+        - influence: Most influential first
+
     feishu_from_date:
       type: string
       format: date
       description: |
         Start date for Feishu document search (only used when search_source is 'feishu'):
         Format: YYYY-MM-DD. Leave empty for no start date limit.
-    
+
     feishu_to_date:
       type: string
       format: date
       description: |
         End date for Feishu document search (only used when search_source is 'feishu'):
         Format: YYYY-MM-DD. Leave empty for no end date limit.
-    
+
     feishu_creator:
       type: string
       description: |
         Creator filter for Feishu document search (only used when search_source is 'feishu'):
         Filter results by document creator. Leave empty for all creators.
-  
+
   required:
     - query
   additionalProperties: false

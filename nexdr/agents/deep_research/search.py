@@ -15,6 +15,7 @@
 from typing import Optional
 from nexdr.agents.deep_research.arxiv_search import arxiv_search_papers
 from nexdr.agents.deep_research.web_search import web_search
+from nexdr.agents.deep_research.semantic_scholar_search import semantic_scholar_search
 from nexau.archs.main_sub.agent_context import GlobalStorage
 from nexdr.agents.tool_types import create_error_tool_result
 
@@ -27,6 +28,9 @@ def search(
     arxiv_categories: Optional[list[str]] = None,
     arxiv_sort_by: Optional[str] = "submittedDate",
     arxiv_sort_order: Optional[str] = "descending",
+    semantic_scholar_fields: Optional[list[str]] = None,
+    semantic_scholar_year_filter: Optional[tuple[int, int]] = None,
+    semantic_scholar_sort_by: Optional[str] = "relevance",
     global_storage: Optional[GlobalStorage] = None,
 ):
     if search_source == "web":
@@ -38,6 +42,15 @@ def search(
             num_results,
             arxiv_sort_by,
             arxiv_sort_order,
+            global_storage,
+        )
+    elif search_source == "semantic_scholar":
+        return semantic_scholar_search(
+            query,
+            num_results,
+            semantic_scholar_fields,
+            semantic_scholar_year_filter,
+            semantic_scholar_sort_by,
             global_storage,
         )
     else:

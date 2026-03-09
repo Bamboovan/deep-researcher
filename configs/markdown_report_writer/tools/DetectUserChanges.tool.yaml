@@ -1,0 +1,34 @@
+name: DetectUserChanges
+description: >-
+  Use this tool to detect and analyze user modifications to a markdown report.
+  This tool compares the original generated markdown file with the user-modified version
+  and provides detailed feedback about what changes were made.
+
+  When to use:
+  - After user has reviewed and modified the generated markdown report
+  - To identify what sections were added, removed, or modified
+  - To understand user's feedback through edits
+  - Before making further revisions based on user changes
+
+  The tool will:
+  1. Compare original and modified files line by line
+  2. Identify added, deleted, and modified sections
+  3. Analyze the type of changes (citations, code, tables, lists, etc.)
+  4. Provide a structured summary of all changes
+
+input_schema:
+  type: object
+  properties:
+    original_file:
+      type: string
+      description: Path to the original generated markdown file
+
+    modified_file:
+      type: string
+      description: Path to the user-modified markdown file
+
+  required:
+    - original_file
+    - modified_file
+  additionalProperties: false
+  $schema: http://json-schema.org/draft-07/schema#
