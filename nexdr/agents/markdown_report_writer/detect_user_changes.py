@@ -103,8 +103,9 @@ def detect_user_changes(
             "modified_sections": changes_analysis.get("modified_sections", []),
             "deleted_sections": changes_analysis.get("deleted_sections", []),
             "diff_preview": ''.join(diff[:50]),  # First 50 lines of diff
+            "intent": infer_user_intent(changes_analysis, original_content, modified_content),  # 新增：意图分析
         }
-        
+
         message = f"User modifications detected: {changes_analysis['summary']}"
         return create_success_tool_result(data, message, "detect_user_changes")
         
@@ -112,6 +113,76 @@ def detect_user_changes(
         error = f"Error detecting user changes: {str(e)}"
         message = "Failed to detect user changes"
         return create_error_tool_result(error, message, "detect_user_changes")
+
+
+def infer_user_intent(changes_analysis: dict, original: str, modified: str) -> dict:
+    """
+    Infer user's editing intent based on changes.
+    
+    Args:
+        changes_analysis: Output from analyze_changes
+        original: Original content
+        modified: Modified content
+        
+    Returns:
+        Dictionary with intent analysis
+    """
+    intent = {
+        "primary_intent": "unknown",
+        "confidence": "low",
+        "suggestions": [],
+        "focus_areas": [],
+    }
+    
+    added_sections = changes_analysis.get("added_sections", [])
+    modified_sections = changes_analysis.get("modified_sections", [])
+    deleted_sections = changes_analysis.get("deleted_sections", [])
+    
+    # 判断用户的主要意图
+    if added_sections:
+        if any(kw in " ".join(added_sections).lower() for kw in ["conclusion", "总结", "展望", "future", "conclusion"]):
+            intent["primary_intent"] = "adding_conclusion"
+            intent["confidence"] = "high"
+            intent["suggestions"].append("用户新增了总结/展望部分，可能需要补充完整的结论")
+        elif any(kw in " ".join(added_sections).lower() for kw in ["method", "方法", "实验", "experiment", " methodology"]):
+            intent["primary_intent"] = "adding_methodology"
+            intent["confidence"] = "high"
+            intent["suggestions"].append("用户新增了方法/实验部分，可能需要补充技术细节")
+        else:
+            intent["primary_intent"] = "adding_content"
+            intent["confidence"] = "medium"
+            intent["suggestions"].append(f"用户新增了章节：{', '.join(added_sections)}")
+            intent["focus_areas"].extend(added_sections)
+    
+    if modified_sections:
+        if "引言" in modified_sections or "introduction" in " ".join(modified_sections).lower():
+            intent["primary_intent"] = "refining_introduction"
+            intent["confidence"] = "medium"
+            intent["suggestions"].append("用户修改了引言，可能希望调整文章的基调或重点")
+        else:
+            intent["primary_intent"] = "refining_content"
+            intent["confidence"] = "medium"
+            intent["suggestions"].append(f"用户修改了以下部分：{', '.join(modified_sections)}")
+            intent["focus_areas"].extend(modified_sections)
+    
+    if deleted_sections:
+        intent["primary_intent"] = "simplifying"
+        intent["confidence"] = "high"
+        intent["suggestions"].append(f"用户删除了：{', '.join(deleted_sections)}，请不要再恢复这些内容")
+    
+    # 综合判断
+    if len(intent["suggestions"]) > 1:
+        intent["primary_intent"] = "mixed"
+        intent["suggestions"].append("用户进行了多处修改，请综合理解用户的意图")
+    
+    # 生成具体的建议
+    if not intent["suggestions"]:
+        intent["suggestions"].append("用户进行了修改，请仔细审查变更内容")
+    
+    intent["suggestions"].append("请保留用户的所有修改，不要覆盖")
+    intent["suggestions"].append("请在用户修改的基础上，完善其他未修改的部分")
+    
+    return intent
 
 
 def analyze_changes(diff: list[str], original: str, modified: str) -> dict:

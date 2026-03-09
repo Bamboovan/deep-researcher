@@ -296,41 +296,88 @@ def markdown_report_with_feedback_loop(
             if change_data.get('deleted_sections'):
                 print(f"  Deleted sections: {', '.join(change_data['deleted_sections'][:5])}")
             
-            # Prepare feedback for agent
-            feedback_message = f"""
-<user_feedback>
-The user has modified the report. Here's what changed:
+            # Read user-modified content
+            with open(report_path, 'r', encoding='utf-8') as f:
+                user_modified_content = f.read()
 
-Summary: {change_data.get('changes_summary', 'Unknown')}
+            # Prepare feedback for agent with intent analysis
+            intent = change_data.get('intent', {})
+            intent_suggestions = '\n'.join(f"  - {s}" for s in intent.get('suggestions', []))
+            
+            feedback_message = f"""<user_feedback>
+用户修改了报告。请理解用户的修改意图，并在用户修改的基础上继续完善。
 
-Details:
+【变更摘要】
+{change_data.get('changes_summary', 'Unknown')}
+
+【变更详情】
 {json.dumps(change_data.get('changes_detail', []), indent=2)}
 
-Please review these changes and continue improving the report.
-Focus on:
-1. Expanding on the sections the user added or modified
-2. Adding more details and evidence to support the user's edits
-3. Maintaining consistency with the user's changes
-4. Do NOT revert or undo the user's modifications
-</user_feedback>
-"""
+【用户意图分析】
+{intent_suggestions}
+
+【重要指令】
+1. 不要调用任何工具（Search、VisitPage 等）- 研究阶段已完成
+2. 保留用户的所有修改，不要覆盖或撤销
+3. 基于用户修改后的版本，继续完善报告：
+   - 补充更多细节、数据和证据
+   - 完善未修改的部分
+   - 保持与用户修改的一致性
+4. 直接输出完整的报告内容，不要调用工具
+
+【用户修改后的完整报告】
+<user_modified_report>
+{user_modified_content}
+</user_modified_report>
+
+请基于用户修改的版本，生成完整的更新版报告。
+只输出报告内容，不要调用工具。
+</user_feedback>"""
             current_message = feedback_message
-            # Update history to include the generated report
-            current_history.append({
-                "role": "assistant",
-                "content": f"[Previous report generated, saved to {report_path}]"
-            })
-            current_history.append({
-                "role": "user",
-                "content": feedback_message
-            })
         else:
             logger.info("No changes detected")
             print("\n✓ No changes detected")
             print("If you want to make changes, please edit the report file and run again.")
             break
     
+    # Cleanup process files before returning
+    cleanup_feedback_loop_files(context)
+    
     return report_path, citation_path, iterations_used
+
+
+def cleanup_feedback_loop_files(context: dict, keep_final: bool = True):
+    """
+    Clean up temporary files generated during feedback loop.
+    
+    Args:
+        context: Context dictionary with workspace info
+        keep_final: Whether to keep the final report (always True in normal use)
+    """
+    workspace = context.get("workspace", "")
+    if not workspace:
+        return
+    
+    # Files to delete (process files)
+    files_to_delete = [
+        os.path.join(workspace, "markdown_report.original.md"),
+        os.path.join(workspace, "markdown_report.user.md"),
+    ]
+    
+    deleted_count = 0
+    for filepath in files_to_delete:
+        if os.path.exists(filepath):
+            try:
+                os.remove(filepath)
+                deleted_count += 1
+                logger.info(f"Cleaned up process file: {filepath}")
+            except Exception as e:
+                logger.warning(f"Failed to delete {filepath}: {e}")
+    
+    if deleted_count > 0:
+        logger.info(f"Cleanup completed: {deleted_count} process file(s) removed")
+        print(f"\n✓ 已清理 {deleted_count} 个过程文件")
+        print(f"  最终报告：{os.path.join(workspace, 'markdown_report.md')}")
 
 
 def html_report_agent_run(
