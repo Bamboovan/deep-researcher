@@ -278,6 +278,9 @@ def markdown_report_with_feedback_loop(
         
         if hasattr(change_result, 'data'):
             change_data = change_result.data
+        elif isinstance(change_result, dict) and 'data' in change_result:
+            # Result is a dict with 'data' key
+            change_data = change_result['data']
         else:
             change_data = change_result
         
