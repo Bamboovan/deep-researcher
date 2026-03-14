@@ -34,40 +34,42 @@ from nexdr.agents.markdown_report_writer.detect_user_changes import detect_user_
 dotenv.load_dotenv()
 
 
-def process_input_files(input_files: list[str], workspace: str, global_storage: GlobalStorage) -> list[dict]:
+def process_input_files(
+    input_files: list[str], workspace: str, global_storage: GlobalStorage
+) -> list[dict]:
     """
     Process input files (PDF, images, text files) and store them in global storage.
-    
+
     Args:
         input_files: List of file paths
         workspace: Workspace directory
         global_storage: Global storage instance
-        
+
     Returns:
         List of processed file info dictionaries
     """
     from nexdr.agents.doc_reader.file_parser import FileParser
     import asyncio
-    
+
     parser = FileParser()
     processed = []
-    
+
     for file_path in input_files:
         if not os.path.exists(file_path):
             logger.warning(f"Input file not found: {file_path}")
             continue
-        
+
         try:
             # Parse the file
             success, content, suffix = asyncio.run(parser.parse(file_path))
-            
+
             if success:
                 # Save extracted content to workspace
                 file_name = os.path.basename(file_path)
                 content_file = os.path.join(workspace, f"{file_name}.extracted.txt")
-                with open(content_file, 'w', encoding='utf-8') as f:
+                with open(content_file, "w", encoding="utf-8") as f:
                     f.write(content)
-                
+
                 # Store file info
                 file_info = {
                     "original_path": file_path,
@@ -78,27 +80,34 @@ def process_input_files(input_files: list[str], workspace: str, global_storage: 
                     "status": "processed",
                 }
                 processed.append(file_info)
-                logger.info(f"Successfully processed file: {file_path} ({len(content)} chars)")
+                logger.info(
+                    f"Successfully processed file: {file_path} ({len(content)} chars)"
+                )
             else:
                 logger.error(f"Failed to process file: {file_path} - {content}")
-                processed.append({
-                    "original_path": file_path,
-                    "file_name": os.path.basename(file_path),
-                    "suffix": suffix,
-                    "status": "failed",
-                    "error": content,
-                })
-                
+                processed.append(
+                    {
+                        "original_path": file_path,
+                        "file_name": os.path.basename(file_path),
+                        "suffix": suffix,
+                        "status": "failed",
+                        "error": content,
+                    }
+                )
+
         except Exception as e:
             logger.exception(f"Error processing file {file_path}: {e}")
-            processed.append({
-                "original_path": file_path,
-                "file_name": os.path.basename(file_path),
-                "status": "error",
-                "error": str(e),
-            })
-    
+            processed.append(
+                {
+                    "original_path": file_path,
+                    "file_name": os.path.basename(file_path),
+                    "status": "error",
+                    "error": str(e),
+                }
+            )
+
     return processed
+
 
 # Create logger
 logger = logging.getLogger()
@@ -191,13 +200,13 @@ def markdown_report_with_feedback_loop(
 ) -> tuple[str, str, int]:
     """
     Generate markdown report with interactive user feedback loop.
-    
+
     Args:
         deep_research_trace_history: Research history from deep research agent
         context: Context dictionary with workspace info
         global_storage: Global storage for state management
         max_iterations: Maximum number of revision iterations
-        
+
     Returns:
         Tuple of (report_path, citation_path, iterations_used)
     """
@@ -205,38 +214,42 @@ def markdown_report_with_feedback_loop(
     markdown_report_agent_config_path = str(
         script_dir / "configs/markdown_report_writer/report_writer.yaml"
     )
-    
+
     agent = load_agent_config(
         markdown_report_agent_config_path,
         global_storage=global_storage,
     )
-    
+
     report_path = os.path.join(context["workspace"], "markdown_report.md")
     citation_path = os.path.join(context["workspace"], "citations.json")
-    original_report_path = os.path.join(context["workspace"], "markdown_report.original.md")
+    original_report_path = os.path.join(
+        context["workspace"], "markdown_report.original.md"
+    )
     user_modified_path = os.path.join(context["workspace"], "markdown_report.user.md")
-    
+
     iterations_used = 0
     current_message = "Please write a markdown report based on the research result."
     current_history = deep_research_trace_history.copy()
-    
+
     for iteration in range(1, max_iterations + 1):
         iterations_used = iteration
-        logger.info(f"=== Generating markdown report (iteration {iteration}/{max_iterations}) ===")
-        
+        logger.info(
+            f"=== Generating markdown report (iteration {iteration}/{max_iterations}) ==="
+        )
+
         # Generate report
         response = agent.run(current_message, history=current_history, context=context)
         report_content, citations = update_citations(response, global_storage)
-        
+
         # Save report
         with open(report_path, "w", encoding="utf-8") as f:
             f.write(report_content)
         with open(citation_path, "w", encoding="utf-8") as f:
             json.dump(citations, f, ensure_ascii=False, indent=2)
-        
+
         # Save original for comparison
         shutil.copy(report_path, original_report_path)
-        
+
         logger.info(f"Report saved to: {report_path}")
         print(f"\n{'='*60}")
         print(f"Iteration {iteration}/{max_iterations} - Report generated")
@@ -249,25 +262,31 @@ def markdown_report_with_feedback_loop(
         print(f"  1. Edit the report file and press Enter to continue")
         print(f"  2. Type 'done' to finish (no more changes)")
         print(f"  3. Type 'skip' to skip this iteration")
-        
+
         # Wait for user to edit
-        user_input = input("\nPress Enter after you've finished editing (or type 'done'/'skip'): ").strip().lower()
-        
-        if user_input == 'done':
+        user_input = (
+            input(
+                "\nPress Enter after you've finished editing (or type 'done'/'skip'): "
+            )
+            .strip()
+            .lower()
+        )
+
+        if user_input == "done":
             logger.info("User finished the feedback loop")
             break
-        elif user_input == 'skip':
+        elif user_input == "skip":
             logger.info("User skipped this iteration")
             continue
-        
+
         # Check if user modified the file
         if not os.path.exists(report_path):
             logger.warning("Report file not found. Ending feedback loop.")
             break
-        
+
         # Copy user-modified file for comparison
         shutil.copy(report_path, user_modified_path)
-        
+
         # Detect changes
         logger.info("Detecting user changes...")
         change_result = detect_user_changes(
@@ -275,35 +294,43 @@ def markdown_report_with_feedback_loop(
             user_modified_path,
             global_storage,
         )
-        
-        if hasattr(change_result, 'data'):
+
+        if hasattr(change_result, "data"):
             change_data = change_result.data
-        elif isinstance(change_result, dict) and 'data' in change_result:
+        elif isinstance(change_result, dict) and "data" in change_result:
             # Result is a dict with 'data' key
-            change_data = change_result['data']
+            change_data = change_result["data"]
         else:
             change_data = change_result
-        
-        if isinstance(change_data, dict) and change_data.get('has_changes'):
+
+        if isinstance(change_data, dict) and change_data.get("has_changes"):
             logger.info(f"Changes detected: {change_data.get('changes_summary')}")
             print(f"\n✓ Changes detected:")
             print(f"  {change_data.get('changes_summary')}")
-            
-            if change_data.get('added_sections'):
-                print(f"  Added sections: {', '.join(change_data['added_sections'][:5])}")
-            if change_data.get('modified_sections'):
-                print(f"  Modified sections: {', '.join(change_data['modified_sections'][:5])}")
-            if change_data.get('deleted_sections'):
-                print(f"  Deleted sections: {', '.join(change_data['deleted_sections'][:5])}")
-            
+
+            if change_data.get("added_sections"):
+                print(
+                    f"  Added sections: {', '.join(change_data['added_sections'][:5])}"
+                )
+            if change_data.get("modified_sections"):
+                print(
+                    f"  Modified sections: {', '.join(change_data['modified_sections'][:5])}"
+                )
+            if change_data.get("deleted_sections"):
+                print(
+                    f"  Deleted sections: {', '.join(change_data['deleted_sections'][:5])}"
+                )
+
             # Read user-modified content
-            with open(report_path, 'r', encoding='utf-8') as f:
+            with open(report_path, "r", encoding="utf-8") as f:
                 user_modified_content = f.read()
 
             # Prepare feedback for agent with intent analysis
-            intent = change_data.get('intent', {})
-            intent_suggestions = '\n'.join(f"  - {s}" for s in intent.get('suggestions', []))
-            
+            intent = change_data.get("intent", {})
+            intent_suggestions = "\n".join(
+                f"  - {s}" for s in intent.get("suggestions", [])
+            )
+
             feedback_message = f"""<user_feedback>
 用户修改了报告。请理解用户的修改意图，并在用户修改的基础上继续完善。
 
@@ -337,19 +364,21 @@ def markdown_report_with_feedback_loop(
         else:
             logger.info("No changes detected")
             print("\n✓ No changes detected")
-            print("If you want to make changes, please edit the report file and run again.")
+            print(
+                "If you want to make changes, please edit the report file and run again."
+            )
             break
-    
+
     # Cleanup process files before returning
     cleanup_feedback_loop_files(context)
-    
+
     return report_path, citation_path, iterations_used
 
 
 def cleanup_feedback_loop_files(context: dict, keep_final: bool = True):
     """
     Clean up temporary files generated during feedback loop.
-    
+
     Args:
         context: Context dictionary with workspace info
         keep_final: Whether to keep the final report (always True in normal use)
@@ -357,13 +386,13 @@ def cleanup_feedback_loop_files(context: dict, keep_final: bool = True):
     workspace = context.get("workspace", "")
     if not workspace:
         return
-    
+
     # Files to delete (process files)
     files_to_delete = [
         os.path.join(workspace, "markdown_report.original.md"),
         os.path.join(workspace, "markdown_report.user.md"),
     ]
-    
+
     deleted_count = 0
     for filepath in files_to_delete:
         if os.path.exists(filepath):
@@ -373,7 +402,7 @@ def cleanup_feedback_loop_files(context: dict, keep_final: bool = True):
                 logger.info(f"Cleaned up process file: {filepath}")
             except Exception as e:
                 logger.warning(f"Failed to delete {filepath}: {e}")
-    
+
     if deleted_count > 0:
         logger.info(f"Cleanup completed: {deleted_count} process file(s) removed")
         print(f"\n✓ 已清理 {deleted_count} 个过程文件")
@@ -421,7 +450,14 @@ def html_report_agent_run(
         return merged_html_filepath
 
 
-def agent_run(query: str, report_format: str, output_dir: str, use_feedback_loop: bool = False, max_iterations: int = 3, input_files: list[str] = None):
+def agent_run(
+    query: str,
+    report_format: str,
+    output_dir: str,
+    use_feedback_loop: bool = False,
+    max_iterations: int = 3,
+    input_files: list[str] = None,
+):
     start_time = datetime.now()
     request_id = f"request_{now_date}"
     workspace = os.path.abspath(output_dir)
@@ -430,18 +466,18 @@ def agent_run(query: str, report_format: str, output_dir: str, use_feedback_loop
     global_storage.set("request_id", request_id)
     global_storage.set("workspace", workspace)
     global_storage.set("date", now_date)
-    
+
     # Process input files if provided
     if input_files:
         logger.info(f"Processing {len(input_files)} input file(s)...")
         processed_files = process_input_files(input_files, workspace, global_storage)
         global_storage.set("input_files", processed_files)
         logger.info(f"Processed {len(processed_files)} file(s) successfully")
-    
+
     context = {"date": now_date, "request_id": request_id, "workspace": workspace}
 
     deep_research_trace_history = research_agent_run(query, context, global_storage)
-    
+
     if report_format == "markdown":
         if use_feedback_loop:
             report_path, citation_path, iterations = markdown_report_with_feedback_loop(
@@ -459,8 +495,10 @@ def agent_run(query: str, report_format: str, output_dir: str, use_feedback_loop
         citation_path = None
     elif report_format == "markdown+html":
         if use_feedback_loop:
-            markdown_report_path, citation_path, iterations = markdown_report_with_feedback_loop(
-                deep_research_trace_history, context, global_storage, max_iterations
+            markdown_report_path, citation_path, iterations = (
+                markdown_report_with_feedback_loop(
+                    deep_research_trace_history, context, global_storage, max_iterations
+                )
             )
             logger.info(f"Feedback loop completed with {iterations} iteration(s)")
         else:
@@ -545,8 +583,8 @@ def main():
     os.makedirs(args.output_dir, exist_ok=True)
     setup_logger(args.output_dir)
     agent_run(
-        args.query, 
-        args.report_format, 
+        args.query,
+        args.report_format,
         args.output_dir,
         use_feedback_loop=args.use_feedback_loop,
         max_iterations=args.max_iterations,

@@ -214,9 +214,9 @@ with col1:
     st.session_state["report_format"] = st.radio(
         "Select report format:",
         options=["html", "markdown"],
-        format_func=lambda x: "Illustrated Report (.html)"
-        if x == "html"
-        else "Text Report (.md)",
+        format_func=lambda x: (
+            "Illustrated Report (.html)" if x == "html" else "Text Report (.md)"
+        ),
         index=0 if st.session_state["report_format"] == "html" else 1,
         disabled=st.session_state["agent_running"],
     )

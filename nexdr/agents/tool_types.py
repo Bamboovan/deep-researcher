@@ -67,9 +67,11 @@ class GenericToolResult:
 
     def to_dict(self) -> dict[str, Any]:
         result = {
-            "status": self.status.value
-            if isinstance(self.status, ToolStatus)
-            else self.status,
+            "status": (
+                self.status.value
+                if isinstance(self.status, ToolStatus)
+                else self.status
+            ),
             "message": self.message,
             "data": self.data,
             "tool_name": self.tool_name,

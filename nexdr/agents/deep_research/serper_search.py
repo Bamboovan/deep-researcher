@@ -204,9 +204,9 @@ class SerperSearch:
                                                 )
                                             )
                                         except Exception as e:
-                                            results[idx]["error"] = (
-                                                f"Failed to download/process image: {str(e)}"
-                                            )
+                                            results[idx][
+                                                "error"
+                                            ] = f"Failed to download/process image: {str(e)}"
                                             return f"Failed to process image: {str(e)}"
 
                                     processing_tasks.append(
@@ -224,17 +224,17 @@ class SerperSearch:
                                 # Assign captions back to results
                                 for idx, caption in zip(valid_image_indices, captions):
                                     if isinstance(caption, Exception):
-                                        results[idx]["caption"] = (
-                                            f"Failed to generate caption: {str(caption)}"
-                                        )
+                                        results[idx][
+                                            "caption"
+                                        ] = f"Failed to generate caption: {str(caption)}"
                                     else:
                                         results[idx]["caption"] = caption
                             except Exception as e:
                                 # Fallback: if parallel processing fails entirely
                                 for idx in valid_image_indices:
-                                    results[idx]["caption"] = (
-                                        f"Parallel processing failed: {str(e)}"
-                                    )
+                                    results[idx][
+                                        "caption"
+                                    ] = f"Parallel processing failed: {str(e)}"
                     else:
                         # For non-image searches, handle base64 images as before
                         for result in results:

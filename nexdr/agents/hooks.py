@@ -154,9 +154,9 @@ class ContinueResearchMiddleware(Middleware):
         self, continue_judge_agent_config_path: str, max_continue_times: int = 5
     ) -> None:
         self.continue_judge_agent_config_path = continue_judge_agent_config_path
-        assert os.path.exists(self.continue_judge_agent_config_path), (
-            f"Continue judge agent config file {self.continue_judge_agent_config_path} does not exist"
-        )
+        assert os.path.exists(
+            self.continue_judge_agent_config_path
+        ), f"Continue judge agent config file {self.continue_judge_agent_config_path} does not exist"
         self.max_continue_times = max_continue_times
         self.continue_times = 0
 
@@ -278,9 +278,9 @@ class TodoValidationMiddleware(Middleware):
             skip_first_n_calls: Skip validation for the first N TodoWrite calls
         """
         self.todo_validator_agent_config_path = todo_validator_agent_config_path
-        assert os.path.exists(self.todo_validator_agent_config_path), (
-            f"Todo validator agent config file {self.todo_validator_agent_config_path} does not exist"
-        )
+        assert os.path.exists(
+            self.todo_validator_agent_config_path
+        ), f"Todo validator agent config file {self.todo_validator_agent_config_path} does not exist"
 
         self.max_validation_times = max_validation_times
         self.validate_every_n_calls = validate_every_n_calls
@@ -566,9 +566,9 @@ class TodoAndContinueMiddleware(Middleware):
         """
         # Todo validation config
         self.todo_validator_agent_config_path = todo_validator_agent_config_path
-        assert os.path.exists(self.todo_validator_agent_config_path), (
-            f"Todo validator agent config file {self.todo_validator_agent_config_path} does not exist"
-        )
+        assert os.path.exists(
+            self.todo_validator_agent_config_path
+        ), f"Todo validator agent config file {self.todo_validator_agent_config_path} does not exist"
 
         self.max_validation_times = max_validation_times
         self.validate_every_n_calls = validate_every_n_calls
@@ -576,9 +576,9 @@ class TodoAndContinueMiddleware(Middleware):
 
         # Continue judge config
         self.continue_judge_agent_config_path = continue_judge_agent_config_path
-        assert os.path.exists(self.continue_judge_agent_config_path), (
-            f"Continue judge agent config file {self.continue_judge_agent_config_path} does not exist"
-        )
+        assert os.path.exists(
+            self.continue_judge_agent_config_path
+        ), f"Continue judge agent config file {self.continue_judge_agent_config_path} does not exist"
 
         self.max_continue_times = max_continue_times
 

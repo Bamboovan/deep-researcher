@@ -206,9 +206,9 @@ def doc_preprocess_function(
         filepath = os.path.join(temp_dir, f"{doc_id}{return_suffix}")
         with open(filepath, "w") as f:
             f.write(doc_content)
-        return_dict["system_remainder"] += (
-            f"The document 【{doc_id}】({url_or_local_file}) is saved to {filepath}"
-        )
+        return_dict[
+            "system_remainder"
+        ] += f"The document 【{doc_id}】({url_or_local_file}) is saved to {filepath}"
     document_info_dict = {
         "id": doc_id,
         "link": url_or_local_file,
