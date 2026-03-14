@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import re
-from nexau.archs.main_sub.agent_context import GlobalStorage
 import logging
+import re
+
+from nexau.archs.main_sub.agent_context import GlobalStorage
 
 logger = logging.getLogger(__name__)
 

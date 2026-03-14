@@ -15,21 +15,21 @@
 """Test the quick start example loading agent from YAML configuration."""
 
 import argparse
-import os
-import logging
-import dotenv
-from datetime import datetime
-from pathlib import Path
 import json
+import logging
+import os
 import shutil
 import time
+from datetime import datetime
+from pathlib import Path
 
+import dotenv
 from nexau.archs.config.config_loader import load_agent_config
 from nexau.archs.main_sub.agent_context import GlobalStorage
-from nexdr.agents.html_creator.merge_slides import build_merged_presentation
-from nexdr.utils.update_citation import update_citations
-from nexdr.agents.markdown_report_writer.detect_user_changes import detect_user_changes
 
+from nexdr.agents.html_creator.merge_slides import build_merged_presentation
+from nexdr.agents.markdown_report_writer.detect_user_changes import detect_user_changes
+from nexdr.utils.update_citation import update_citations
 
 dotenv.load_dotenv()
 
@@ -48,8 +48,9 @@ def process_input_files(
     Returns:
         List of processed file info dictionaries
     """
-    from nexdr.agents.doc_reader.file_parser import FileParser
     import asyncio
+
+    from nexdr.agents.doc_reader.file_parser import FileParser
 
     parser = FileParser()
     processed = []

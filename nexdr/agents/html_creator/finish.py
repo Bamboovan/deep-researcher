@@ -23,10 +23,11 @@ import logging
 import os
 import tempfile
 from datetime import datetime
-from nexau.archs.main_sub.agent_state import AgentState
-from nexdr.agents.tool_types import create_success_tool_result, create_error_tool_result
-from nexdr.agents.html_creator.merge_slides import build_merged_presentation
 
+from nexau.archs.main_sub.agent_state import AgentState
+
+from nexdr.agents.html_creator.merge_slides import build_merged_presentation
+from nexdr.agents.tool_types import create_error_tool_result, create_success_tool_result
 
 logger = logging.getLogger(__name__)
 

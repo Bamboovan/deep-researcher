@@ -19,8 +19,10 @@ Detect user modifications to markdown reports and provide feedback to the agent.
 import difflib
 import os
 from typing import Optional
+
 from nexau.archs.main_sub.agent_context import GlobalStorage
-from nexdr.agents.tool_types import create_success_tool_result, create_error_tool_result
+
+from nexdr.agents.tool_types import create_error_tool_result, create_success_tool_result
 
 
 def detect_user_changes(

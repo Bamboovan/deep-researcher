@@ -13,11 +13,13 @@
 # limitations under the License.
 
 import re
+
 import jieba
 import numpy as np
-from rank_bm25 import BM25Okapi
 from nexau.archs.main_sub.agent_context import GlobalStorage
-from nexdr.agents.tool_types import create_success_tool_result, create_error_tool_result
+from rank_bm25 import BM25Okapi
+
+from nexdr.agents.tool_types import create_error_tool_result, create_success_tool_result
 
 
 def word_tokenize(text: str) -> list[str]:

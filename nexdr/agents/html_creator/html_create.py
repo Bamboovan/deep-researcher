@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from nexau.archs.main_sub.agent_state import AgentState
-from nexau.archs.main_sub.agent_context import GlobalStorage
-from nexau.archs.config.config_loader import load_agent_config
 import os
+
+from nexau.archs.config.config_loader import load_agent_config
+from nexau.archs.main_sub.agent_context import GlobalStorage
+from nexau.archs.main_sub.agent_state import AgentState
 
 
 def get_deep_research_trace(global_storage: GlobalStorage = None):

@@ -22,7 +22,7 @@ import subprocess
 import threading
 import time
 from pathlib import Path
-from queue import Queue, Empty
+from queue import Empty, Queue
 
 import streamlit as st
 import streamlit.components.v1 as components

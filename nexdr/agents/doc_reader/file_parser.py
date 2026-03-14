@@ -22,7 +22,6 @@ from pathlib import Path
 from typing import Tuple
 from urllib import request as urllib_request
 
-
 logger = logging.getLogger(__name__)
 
 JINA_READER_ENDPOINT = "https://r.jina.ai/"

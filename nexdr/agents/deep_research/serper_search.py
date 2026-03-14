@@ -21,7 +21,6 @@ from typing import Any
 import httpx
 from PIL import Image
 
-
 IMAGE_CAPTIONER_SYSTEM_PROMPT = """
 You are a helpful assistant that captions images.  
 Your task:  
@@ -288,8 +287,8 @@ def search_images(query: str) -> list[dict[str, Any]]:
 
 
 if __name__ == "__main__":
-    import time
     import json
+    import time
 
     searcher = SerperSearch()
 
