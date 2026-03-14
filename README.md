@@ -99,8 +99,8 @@ python quick_start.py \
 
 ```bash
 # 克隆仓库
-git clone https://github.com/nex-agi/NexDR.git
-cd NexDR
+git clone https://github.com/Bamboovan/deep-researcher.git
+cd deep-researcher
 
 # 使用 uv 安装
 uv sync
@@ -110,8 +110,8 @@ uv sync
 
 ```bash
 # 克隆仓库
-git clone https://github.com/nex-agi/NexDR.git
-cd NexDR
+git clone https://github.com/Bamboovan/deep-researcher.git
+cd deep-researcher
 
 # 安装依赖
 pip install -e .

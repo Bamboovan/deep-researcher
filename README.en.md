@@ -99,8 +99,8 @@ python quick_start.py \
 
 ```bash
 # Clone the repository
-git clone https://github.com/nex-agi/NexDR.git
-cd NexDR
+git clone https://github.com/Bamboovan/deep-researcher.git
+cd deep-researcher
 
 # Install with uv
 uv sync
@@ -110,8 +110,8 @@ uv sync
 
 ```bash
 # Clone the repository
-git clone https://github.com/nex-agi/NexDR.git
-cd NexDR
+git clone https://github.com/Bamboovan/deep-researcher.git
+cd deep-researcher
 
 # Install dependencies
 pip install -e .
