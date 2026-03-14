@@ -14,11 +14,6 @@
 
 """Tests for detect_user_changes module."""
 
-import tempfile
-from pathlib import Path
-
-import pytest
-
 from nexdr.agents.markdown_report_writer.detect_user_changes import (
     analyze_change_types,
     analyze_changes,

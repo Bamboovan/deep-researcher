@@ -22,7 +22,6 @@ import pytest
 
 from nexdr.agents.deep_research.semantic_scholar_search import (
     SemanticScholarSearch,
-    search_papers,
     semantic_scholar_search,
 )
 
