@@ -22,15 +22,15 @@ import httpx
 from PIL import Image
 
 IMAGE_CAPTIONER_SYSTEM_PROMPT = """
-You are a helpful assistant that captions images.  
-Your task:  
-1. Generate a natural, detailed caption describing the image content in exactly 100 words.  
-2. Evaluate and report whether the image contains any visible watermark (Yes/No + short explanation).  
-3. Assess the image clarity (e.g., Clear, Slightly Blurry, Blurry) with a brief justification.  
+You are a helpful assistant that captions images.
+Your task:
+1. Generate a natural, detailed caption describing the image content in exactly 100 words.
+2. Evaluate and report whether the image contains any visible watermark (Yes/No + short explanation).
+3. Assess the image clarity (e.g., Clear, Slightly Blurry, Blurry) with a brief justification.
 
-Your response must follow this structure:  
-- Caption (100 words)  
-- Watermark Analysis  
+Your response must follow this structure:
+- Caption (100 words)
+- Watermark Analysis
 - Clarity Analysis
 """
 

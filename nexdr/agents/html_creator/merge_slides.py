@@ -129,7 +129,7 @@ def build_merged_presentation(
             padding: 0;
             box-sizing: border-box;
         }}
-        
+
         html, body {{
             width: 100%;
             height: 100%;
@@ -138,7 +138,7 @@ def build_merged_presentation(
             margin: 0;
             padding: 0;
         }}
-        
+
         body {{
             font-family: 'Noto Sans SC', sans-serif;
             outline: none;
@@ -146,11 +146,11 @@ def build_merged_presentation(
             display: flex;
             justify-content: center;
         }}
-        
+
         body:focus {{
             outline: none;
         }}
-        
+
         /* Page container */
         #pages-container {{
             position: fixed;
@@ -160,7 +160,7 @@ def build_merged_presentation(
             height: 100%;
             overflow: hidden;
         }}
-        
+
         /* Transparent overlay to capture clicks and maintain focus */
         .page-overlay {{
             position: absolute;
@@ -171,7 +171,7 @@ def build_merged_presentation(
             z-index: 1;
             pointer-events: none;
         }}
-        
+
         .page {{
             position: absolute;
             top: 0;
@@ -185,13 +185,13 @@ def build_merged_presentation(
             margin: 0;
             padding: 0;
         }}
-        
+
         .page.active {{
             opacity: 1;
             visibility: visible;
             z-index: 1;
         }}
-        
+
         .page iframe {{
             position: absolute;
             top: 0;
@@ -204,7 +204,7 @@ def build_merged_presentation(
             display: block;
             overflow: auto;
         }}
-        
+
         /* Navigation bar */
         #navigation {{
             position: fixed;
@@ -222,15 +222,15 @@ def build_merged_presentation(
             z-index: 10000;
             transition: opacity 0.3s ease;
         }}
-        
+
         #navigation:hover {{
             opacity: 1;
         }}
-        
+
         #navigation {{
             opacity: 0.6;
         }}
-        
+
         #navigation button {{
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -246,21 +246,21 @@ def build_merged_presentation(
             width: 40px;
             height: 40px;
         }}
-        
+
         #navigation button:hover:not(:disabled) {{
             background: rgba(255, 255, 255, 0.25);
             transform: scale(1.05);
         }}
-        
+
         #navigation button:disabled {{
             opacity: 0.3;
             cursor: not-allowed;
         }}
-        
+
         #navigation button .material-icons {{
             font-size: 20px !important;
         }}
-        
+
         #page-indicator {{
             color: white;
             font-size: 13px;
@@ -271,27 +271,27 @@ def build_merged_presentation(
             border-radius: 8px;
             white-space: nowrap;
         }}
-        
+
         .button-group {{
             display: flex;
             gap: 6px;
         }}
-        
+
         /* Scrollbar styles */
         ::-webkit-scrollbar {{
             width: 8px;
         }}
-        
+
         ::-webkit-scrollbar-track {{
             background: rgba(255, 255, 255, 0.1);
             border-radius: 4px;
         }}
-        
+
         ::-webkit-scrollbar-thumb {{
             background: rgba(255, 255, 255, 0.3);
             border-radius: 4px;
         }}
-        
+
         ::-webkit-scrollbar-thumb:hover {{
             background: rgba(255, 255, 255, 0.5);
         }}
@@ -302,7 +302,7 @@ def build_merged_presentation(
     <div id="pages-container">
 {pages_html}
     </div>
-    
+
     <!-- Navigation bar -->
     <div id="navigation">
         <div class="button-group">
@@ -323,12 +323,12 @@ def build_merged_presentation(
         </div>
         <div id="page-indicator">1 / {total_pages}</div>
     </div>
-    
+
     <script>
         // Page state
         let currentPage = 0;
         const totalPages = {total_pages};
-        
+
         // Initialize
         function init() {{
             // Make body focusable to capture keyboard events
@@ -353,7 +353,7 @@ def build_merged_presentation(
             showPage(0);
             updateNavigation();
         }}
-        
+
         // Show specified page
         function showPage(pageIndex) {{
             if (pageIndex < 0 || pageIndex >= totalPages) return;
@@ -371,7 +371,7 @@ def build_merged_presentation(
                 updateNavigation();
             }}
         }}
-        
+
         // Update navigation button states
         function updateNavigation() {{
             document.getElementById('page-indicator').textContent = `${{currentPage + 1}} / ${{totalPages}}`;
@@ -380,28 +380,28 @@ def build_merged_presentation(
             document.getElementById('next-btn').disabled = currentPage === totalPages - 1;
             document.getElementById('last-btn').disabled = currentPage === totalPages - 1;
         }}
-        
+
         // Navigation functions
         function nextPage() {{
             if (currentPage < totalPages - 1) {{
                 showPage(currentPage + 1);
             }}
         }}
-        
+
         function prevPage() {{
             if (currentPage > 0) {{
                 showPage(currentPage - 1);
             }}
         }}
-        
+
         function firstPage() {{
             showPage(0);
         }}
-        
+
         function lastPage() {{
             showPage(totalPages - 1);
         }}
-        
+
         // Event listeners
         document.getElementById('next-btn').addEventListener('click', nextPage);
         document.getElementById('prev-btn').addEventListener('click', prevPage);
