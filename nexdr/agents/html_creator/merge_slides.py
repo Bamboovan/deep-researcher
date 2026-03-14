@@ -407,7 +407,7 @@ def build_merged_presentation(
         document.getElementById('prev-btn').addEventListener('click', prevPage);
         document.getElementById('first-btn').addEventListener('click', firstPage);
         document.getElementById('last-btn').addEventListener('click', lastPage);
-        
+
         // Keyboard events - use window to ensure we capture all keyboard events
         window.addEventListener('keydown', (e) => {{
             switch(e.key) {{
@@ -433,7 +433,7 @@ def build_merged_presentation(
                     break;
             }}
         }}, true);
-        
+
         // Mouse wheel support
         let wheelTimeout;
         document.addEventListener('wheel', (e) => {{
@@ -446,7 +446,7 @@ def build_merged_presentation(
                 }}
             }}, 100);
         }}, {{ passive: true }});
-        
+
         // Initialize page
         init();
     </script>

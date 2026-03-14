@@ -318,12 +318,10 @@ def extract_markdown_sections(content: str) -> list[dict]:
                     {
                         "title": current_section,
                         "content": "\n".join(current_content),
-                        "level": len(match.group(1)) if current_section else 0,
                     }
                 )
 
             # Start new section
-            level = len(match.group(1))
             current_section = match.group(2).strip()
             current_content = []
         else:
